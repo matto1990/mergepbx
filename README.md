@@ -2,7 +2,7 @@
 
 A tool for merging Xcode project files in git
 
-Version: 0.6 - 2nd Oct 2014
+Version: 0.9 - 23rd March 2015
 Status: Alpha
 
 * Follow us on twitter: https://twitter.com/mergepbx
@@ -30,41 +30,21 @@ Note also, that this script can't solve conflicts, that are really conflicts. Fo
 
 ## Usage ##
 
-To use this script, you have to configure it as a merge driver for you project file. To do this, you have to take the following steps:
+To use this script, you can either install using [Homebrew](http://brew.sh), or if you prefer build it yourself. To install with Homebrew simply run:
 
-### Building ###
+```sh
+brew install mergepbx
+```
 
-Execute the following command in the directory of the cloned project:
+To build yourself clone the repository to you maching and then execute the following command in the root of the project:
 
 ```
 ./build.py
 ```
 
-That should build the mergepbx executable that you can use. It is a specially crafted zip file that contains all needed python files and can directly be executed on the commandline
+That should build the `mergepbx` executable that you can use. You then need to place the executable into a location on your command line path (`echo $PATH` to find where these are on your machine).
 
-### Using mergepbx as merge tool ###
-
-You can add mergepbx as a merge tool, so you can use it to manually start merging the project file with `git mergetool --tool=mergepbx PROJECT.pbxproj`.
-
-#### Add mergepbx as a merge tool ####
-
-Open `~/.gitconfig` (create if it does not exist) and add the following lines to it:
-
-```
-#driver for merging Xcode project files
-[mergetool "mergepbx"]
-	cmd = mergepbx "$BASE" "$LOCAL" "$REMOTE" -o "$MERGED"
-```
-
-#### Merging project files ####
-
-After you have encountered a failed automatic merge, you can now use the following command to start the automatic merge with `mergepbx`:
-
-```
-git mergetool --tool=mergepbx PROJECT.pbxproj
-```
-
-Afterwards, the project file should be merged and marked as resolved.
+You then need to follow the steps to setup Mergepbx as either a [merge tool](http://git-scm.com/docs/git-mergetool) or a merge driver. The merge tool will need to be run by you on the command line each time you want to resolve conflicts in the project file, whereas the merge driver can be set up to automatically resolve conflicts when they are found.
 
 ### Using mergepbx as a merge driver ###
 
@@ -79,21 +59,35 @@ Open `~/.gitconfig` (create if it does not exist) and add the following lines to
         driver = mergepbx %O %A %B
 ```
 
-Replace mergepbx with the path to the file you downloaded (You might want to add that file to your $PATH)
-
-#### Configure your repository to use the driver ####
-
 In your repository root directory, open the file `.gitattributes` (create if it does not exist). Add the following lines to it:
 
 ```
 *.pbxproj merge=mergepbx
 ```
 
-#### Merging project files ####
+You will need to repeat the `.gitattributes` step for each of your git repositories that you want to enable Mergepbx in.
 
-If you merge branches with git now, git will automatically use mergepbx for .pbxproj files. You don't have to do anything special, simply merge your branches as before.
+If you merge branches with git now, git will automatically use mergepbx for `*.pbxproj` files. You don't have to do anything special, simply merge your branches as before.
 
 Note that this script is not really fast, I didn't optimize it for speed and especially the plist parser is not very fast.
+
+### Using mergepbx as merge tool ###
+
+Open `~/.gitconfig` (create if it does not exist) and add the following lines to it:
+
+```
+#driver for merging Xcode project files
+[mergetool "mergepbx"]
+	cmd = mergepbx "$BASE" "$LOCAL" "$REMOTE" -o "$MERGED"
+```
+
+After you have encountered a failed automatic merge, you can now use the following command to start the automatic merge with `mergepbx`:
+
+```
+git mergetool --tool=mergepbx PROJECT.pbxproj
+```
+
+Afterwards, the project file should be merged and marked as resolved.
 
 ## Alternatives ##
 
